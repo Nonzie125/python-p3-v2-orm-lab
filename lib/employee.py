@@ -103,7 +103,7 @@ class Employee:
             WHERE id = ?
         """
         CURSOR.execute(sql, (self.name, self.job_title,
-                             self.department_id, self.id))
+                            self.department_id, self.id))
         CONN.commit()
 
     def delete(self):
@@ -187,4 +187,13 @@ class Employee:
 
     def reviews(self):
         """Return list of reviews associated with current employee"""
-        pass
+        from review import Review  # Avoid circular imports
+    
+        sql = """
+            SELECT * FROM reviews WHERE employee_id = ?;
+        """
+        rows = CURSOR.execute(sql, (self.id,)).fetchall()
+    
+        reviews = [Review.instance_from_db(row) for row in rows]  # Create Review instances for each row
+    
+        return reviews
